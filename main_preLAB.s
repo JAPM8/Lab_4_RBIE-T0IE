@@ -52,19 +52,32 @@ resetVec:
     GOTO    MAIN
 
 ORG 04h			     ; Posición 0004h para las interrupciones
-PUSH:
-    MOVWF  W_TEMP
-    SWAPF  STATUS, W
-    MOVWF  STATUS_TEMP
+PUSH:			     ; Se guarda el PC en la pila
+    MOVWF  W_TEMP	     ; Movemos el registro W a la variable W_TEMP
+    SWAPF  STATUS, W	     ; Se hace un swap de Nibbles del status y se guarda en W
+    MOVWF  STATUS_TEMP	     ; Se pasa el registro W a la variable STATUS_TEMP
     
-ISR:
-   
-POP:
-    SWAPF   STATUS_TEMP, W
-    MOVWF   STATUS
-    SWAPF   W_TEMP, F
-    SWAPF   W_TEMP, W
-    RETFIE
+ISR:			     ; Rutina de interrupción
+    BTFSC   RBIF	     ; Se verifica la bandera de cambio de estado de PORTB
+    CALL    INT_IOCB	     ; Pasamos a subrutina INT_IOCB
+POP:			     ; Se regresan las instrucciones de la pila al main
+    SWAPF   STATUS_TEMP, W   ; Se hace swap de Nibbles de nuevo al STATUS
+    MOVWF   STATUS	     ; Se mueve el registro W a STATUS
+    SWAPF   W_TEMP, F	     ; Swap de Nibbles del registro W y se pasa a F
+    SWAPF   W_TEMP, W	     ; Swap de Nibbles del registro W y se pasa a W
+    RETFIE		     ; Se regresa de la interrupción 
+
+;---------------Subrutinas de int------------
+INT_IOCB:
+    BANKSEL PORTB
+    BTFSS   PORTB, UP	     ; Se verifica estado de los botones para inc o dec del contador
+    INCF    PORTA
+    BTFSS   PORTB, DOWN
+    DECF    PORTA
+    
+    BCF	    RBIF	     ; Se limpia la flag de cambio de estado del PORTB		
+    
+    RETURN
     
 ; CONFIG uCS
 PSECT code, delta=2, abs
@@ -90,15 +103,17 @@ CONFIG_PINES:
     CLRF    ANSELH	      ; Rb como I/O digital
     
     BANKSEL TRISA
-    MOVLW   0h
-    MOVWF   TRISA	      ; Ra0 a Ra3 como salida
+    BCF	    TRISA, 0          ; Ra0 a Ra3 como salida
+    BCF	    TRISA, 1
+    BCF	    TRISA, 2
+    BCF	    TRISA, 3
     
     BANKSEL TRISB	      ; Cambiamos de banco
     BSF	    TRISB, UP	      ; Rb0 y Rb1 como inputs
     BSF	    TRISB, DOWN
     
     BANKSEL OPTION_REG	      ; Cambiamos de banco
-    BCF	    OPTION_REG,	7     ; PORTB pull-up habilitadas
+    BCF	    OPTION_REG,	7     ; PORTB pull-up habilitadas (RBPU)
     BANKSEL WPUB
     BSF	    WPUB, UP	      ; Se habilita registro de Pull-up para Rb0 y Rb1
     BSF	    WPUB, DOWN	    
@@ -121,19 +136,19 @@ CONFIG_RELOJ:
     RETURN
     
 ENABLE_INTS:
-    BSF	GIE		      ; INTCON
-    BSF RBIE		          
-    BSF	RBIF
+    BSF	GIE		      ; Se habilitan todas las interrupciones
+    BSF RBIE		      ; Se habilita la interrupción de cambio de estado de PORTB	          
+    BSF	RBIF		      ; Flag de cambio de estado de PORTB
     RETURN
     
 CONFIG_IOCRB:
-    BANKSEL TRISA
-    BSF	    IOCB, UP
+    BANKSEL TRISA	      ; Cambio de banco
+    BSF	    IOCB, UP	      ; Se habilita interrupción de cambio de estado para Rb0 y Rb1
     BSF	    IOCB, DOWN
     
-    BANKSEL PORTA
-    MOVF    PORTB, W	    ; Al leer termina la condición de mismatch
-    BCF	    RBIF
+    BANKSEL PORTA	      ; Cambio de banco
+    MOVF    PORTB, W	      ; Al leer termina la condición de mismatch
+    BCF	    RBIF	      ; Se limpia la flag de cambio de estado de PORTB
     RETURN
     
 END
