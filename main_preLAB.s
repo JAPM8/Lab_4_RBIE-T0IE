@@ -138,7 +138,7 @@ CONFIG_RELOJ:
 ENABLE_INTS:
     BSF	GIE		      ; Se habilitan todas las interrupciones
     BSF RBIE		      ; Se habilita la interrupción de cambio de estado de PORTB	          
-    BSF	RBIF		      ; Flag de cambio de estado de PORTB
+    BCF	RBIF		      ; Flag de cambio de estado de PORTB
     RETURN
     
 CONFIG_IOCRB:

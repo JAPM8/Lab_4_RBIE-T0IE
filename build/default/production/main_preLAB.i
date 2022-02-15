@@ -2574,7 +2574,7 @@ CONFIG_RELOJ:
 ENABLE_INTS:
     BSF ((INTCON) and 07Fh), 7 ; Se habilitan todas las interrupciones
     BSF ((INTCON) and 07Fh), 3 ; Se habilita la interrupción de cambio de estado de PORTB
-    BSF ((INTCON) and 07Fh), 0 ; Flag de cambio de estado de PORTB
+    BCF ((INTCON) and 07Fh), 0 ; Flag de cambio de estado de PORTB
     RETURN
 
 CONFIG_IOCRB:
