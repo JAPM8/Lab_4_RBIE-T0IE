@@ -32,6 +32,10 @@ CONFIG  LVP = ON              ; Low Voltage Programming Enable bit (RB3/PGM pin 
 ; CONFIG2
 CONFIG  BOR4V = BOR40V        ; Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
 CONFIG  WRT = OFF             ; Flash Program Memory Self Write Enable bits (Write protection off)
+
+UP   EQU 0		      ; Definimos nombres a pines 0 y 1
+DOWN EQU 1
+ 
 ; Status para interrupciones
 PSECT udata_shr		      ; Common memory
    W_TEMP:	DS 1	      ; 1 Byte
@@ -47,6 +51,21 @@ resetVec:
     PAGESEL MAIN
     GOTO    MAIN
 
+ORG 04h			     ; Posición 0004h para las interrupciones
+PUSH:
+    MOVWF  W_TEMP
+    SWAPF  STATUS, W
+    MOVWF  STATUS_TEMP
+    
+ISR:
+   
+POP:
+    SWAPF   STATUS_TEMP, W
+    MOVWF   STATUS
+    SWAPF   W_TEMP, F
+    SWAPF   W_TEMP, W
+    RETFIE
+    
 ; CONFIG uCS
 PSECT code, delta=2, abs
 ORG 100h                      ; posición para el código
@@ -55,9 +74,66 @@ ORG 100h                      ; posición para el código
  MAIN:
 ; Configuración Inputs y Outputs
     CALL    CONFIG_PINES
-; Configuración deL Oscilador
+; Configuración deL Oscilador (1 MHz)
     CALL    CONFIG_RELOJ
-; Configuración Timer0
-    CALL    CONFIG_TIMER0
+; Configuración de interrupciones
+    CALL    ENABLE_INTS
+; Configuración de lectura de cambios en puerto B
+    CALL    CONFIG_IOCRB
 
+LOOP:
+    GOTO LOOP
 
+CONFIG_PINES:
+    BANKSEL ANSEL	      ; Cambiamos de banco
+    CLRF    ANSEL	      ; Ra como I/O digital
+    CLRF    ANSELH	      ; Rb como I/O digital
+    
+    BANKSEL TRISA
+    MOVLW   0h
+    MOVWF   TRISA	      ; Ra0 a Ra3 como salida
+    
+    BANKSEL TRISB	      ; Cambiamos de banco
+    BSF	    TRISB, UP	      ; Rb0 y Rb1 como inputs
+    BSF	    TRISB, DOWN
+    
+    BANKSEL OPTION_REG	      ; Cambiamos de banco
+    BCF	    OPTION_REG,	7     ; PORTB pull-up habilitadas
+    BANKSEL WPUB
+    BSF	    WPUB, UP	      ; Se habilita registro de Pull-up para Rb0 y Rb1
+    BSF	    WPUB, DOWN	    
+    
+    BANKSEL PORTA             ; Cambiamos de banco
+    CLRF    PORTA	      ; Limpieza de puertos para que inicie en 0
+    CLRF    PORTB
+    
+    RETURN
+    
+CONFIG_RELOJ:
+    BANKSEL OSCCON	      ; Cambiamos de banco
+    BSF	    OSCCON, 0	      ; Seteamos para utilizar reloj interno (SCS=1)
+    
+    ;Se modifican los bits 4 al 6 de OSCCON al valor de 100b para frecuencia de 1 MHz (IRCF=100b)
+    BSF	    OSCCON, 6
+    BCF	    OSCCON, 5
+    BCF	    OSCCON, 4
+    
+    RETURN
+    
+ENABLE_INTS:
+    BSF	GIE		      ; INTCON
+    BSF RBIE		          
+    BSF	RBIF
+    RETURN
+    
+CONFIG_IOCRB:
+    BANKSEL TRISA
+    BSF	    IOCB, UP
+    BSF	    IOCB, DOWN
+    
+    BANKSEL PORTA
+    MOVF    PORTB, W	    ; Al leer termina la condición de mismatch
+    BCF	    RBIF
+    RETURN
+    
+END
