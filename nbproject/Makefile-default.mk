@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main_preLAB.s
+SOURCEFILES_QUOTED_IF_SPACED=main_Lab.s
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main_preLAB.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main_preLAB.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main_Lab.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main_Lab.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main_preLAB.o
+OBJECTFILES=${OBJECTDIR}/main_Lab.o
 
 # Source Files
-SOURCEFILES=main_preLAB.s
+SOURCEFILES=main_Lab.s
 
 
 
@@ -95,21 +95,21 @@ FINAL_IMAGE_NAME_MINUS_EXTENSION=${DISTDIR}/Lab_4_RBIE_T0IE.X.${IMAGE_TYPE}
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: pic-as-assembler
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/main_preLAB.o: main_preLAB.s  nbproject/Makefile-${CND_CONF}.mk 
+${OBJECTDIR}/main_Lab.o: main_Lab.s  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/main_preLAB.o 
+	@${RM} ${OBJECTDIR}/main_Lab.o 
 	${MP_AS} -mcpu=PIC16F887 -c \
-	-o ${OBJECTDIR}/main_preLAB.o \
-	main_preLAB.s \
+	-o ${OBJECTDIR}/main_Lab.o \
+	main_Lab.s \
 	 -D__DEBUG=1  -msummary=+mem,-psect,-class,-hex,-file,-sha1,-sha256,-xml,-xmlfull -fmax-errors=20 -mwarn=0 -xassembler-with-cpp
 	
 else
-${OBJECTDIR}/main_preLAB.o: main_preLAB.s  nbproject/Makefile-${CND_CONF}.mk 
+${OBJECTDIR}/main_Lab.o: main_Lab.s  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/main_preLAB.o 
+	@${RM} ${OBJECTDIR}/main_Lab.o 
 	${MP_AS} -mcpu=PIC16F887 -c \
-	-o ${OBJECTDIR}/main_preLAB.o \
-	main_preLAB.s \
+	-o ${OBJECTDIR}/main_Lab.o \
+	main_Lab.s \
 	 -msummary=+mem,-psect,-class,-hex,-file,-sha1,-sha256,-xml,-xmlfull -fmax-errors=20 -mwarn=0 -xassembler-with-cpp
 	
 endif

@@ -1,7 +1,7 @@
-# 1 "main_preLAB.s"
+# 1 "main_Lab.s"
 # 1 "<built-in>" 1
-# 1 "main_preLAB.s" 2
-# 15 "main_preLAB.s"
+# 1 "main_Lab.s" 2
+# 16 "main_Lab.s"
 PROCESSOR 16F887
 
 
@@ -2450,7 +2450,7 @@ stk_offset SET 0
 auto_size SET 0
 ENDM
 # 7 "C:\\Program Files\\Microchip\\xc8\\v2.35\\pic\\include\\xc.inc" 2 3
-# 18 "main_preLAB.s" 2
+# 19 "main_Lab.s" 2
 
 ; CONFIG1
 CONFIG FOSC = INTRC_NOCLKOUT ; Oscillator Selection bits (INTOSCIO oscillator: I/O function on ((PORTA) and 07Fh), 6/OSC2/CLKOUT pin, I/O function on ((PORTA) and 07Fh), 7/OSC1/CLKIN)
@@ -2469,8 +2469,21 @@ CONFIG LVP = ON ; Low Voltage Programming Enable bit (((PORTB) and 07Fh), 3/PGM 
 CONFIG BOR4V = BOR40V ; Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
 CONFIG WRT = OFF ; Flash Program Memory Self Write Enable bits (Write protection off)
 
+RESET_TMR0 MACRO
+    BANKSEL TMR0 ; Cambiamos al banco 1
+    ;N=256-((20 ms)(4 MHz)/4*256) -> N= 217 aprox
+    MOVLW 217 ; Se mueve N al registro W
+    MOVWF TMR0 ; Se le dan los 20 ms de delay a TMR0
+    BCF ((INTCON) and 07Fh), 2 ; Limpiamos la bandera de interrupción
+
+    ENDM
+
 UP EQU 0 ; Definimos nombres a pines 0 y 1
 DOWN EQU 1
+
+; Variables
+PSECT udata_bank0 ; Common memory
+    CONT_TMR: DS 1 ; 2 Byte
 
 ; Status para interrupciones
 PSECT udata_shr ; Common memory
@@ -2494,6 +2507,9 @@ PUSH: ; Se guarda el PC en la pila
     MOVWF STATUS_TEMP ; Se pasa el registro W a la variable STATUS_TEMP
 
 ISR: ; Rutina de interrupción
+    BTFSC ((INTCON) and 07Fh), 2 ; Verficamos bandera de interrupción del TMR0
+    CALL CONT_TMR0 ; Pasamos a subrutina de interrupción del TMR0
+
     BTFSC ((INTCON) and 07Fh), 0 ; Se verifica la bandera de cambio de estado de PORTB
     CALL INT_IOCB ; Pasamos a subrutina INT_IOCB
 POP: ; Se regresan las instrucciones de la pila al main
@@ -2501,6 +2517,7 @@ POP: ; Se regresan las instrucciones de la pila al main
     MOVWF STATUS ; Se mueve el registro W a STATUS
     SWAPF W_TEMP, F ; Swap de Nibbles del registro W y se pasa a F
     SWAPF W_TEMP, W ; Swap de Nibbles del registro W y se pasa a W
+
     RETFIE ; Se regresa de la interrupción
 
 ;---------------Subrutinas de int------------
@@ -2515,6 +2532,23 @@ INT_IOCB:
 
     RETURN
 
+CONT_TMR0:
+    RESET_TMR0 ; Reinicio TMR0
+    INCF CONT_TMR ; Se aumenta el valor de repeticiones de 20 ms
+    MOVF CONT_TMR, W ; Se mueve la cantidad de repeticiones a W
+    SUBLW 50 ; Se resta la literal con W (50 rep = 1000 ms)
+    BTFSC ((STATUS) and 07Fh), 2 ; Se verifica si la última operación resultó en 0
+    GOTO INC_CONT2 ; Se pasa a la subrutina de aumento del CONT en C
+
+    RETURN
+
+INC_CONT2:
+    CLRF CONT_TMR ; Limpiamos variable de repeticiones TMR0
+    INCF PORTC ; Se aumenta el valor del contador en C
+
+    RETURN
+
+
 ; CONFIG uCS
 PSECT code, delta=2, abs
 ORG 100h ; posición para el código
@@ -2523,14 +2557,18 @@ ORG 100h ; posición para el código
  MAIN:
 ; Configuración Inputs y Outputs
     CALL CONFIG_PINES
-; Configuración deL Oscilador (1 MHz)
+; Configuración deL Oscilador (4 MHz)
     CALL CONFIG_RELOJ
+; Configuración Timer0
+    CALL CONFIG_TIMER0
 ; Configuración de interrupciones
     CALL ENABLE_INTS
 ; Configuración de lectura de cambios en puerto B
     CALL CONFIG_IOCRB
 
+
 LOOP:
+
     GOTO LOOP
 
 CONFIG_PINES:
@@ -2554,9 +2592,16 @@ CONFIG_PINES:
     BSF WPUB, UP ; Se habilita registro de Pull-up para Rb0 y Rb1
     BSF WPUB, DOWN
 
+    BANKSEL TRISC
+    BCF TRISC, 0 ; Rc0 a Rc3 como salida
+    BCF TRISC, 1
+    BCF TRISC, 2
+    BCF TRISC, 3
+
     BANKSEL PORTA ; Cambiamos de banco
     CLRF PORTA ; Limpieza de puertos para que inicie en 0
     CLRF PORTB
+    CLRF PORTC
 
     RETURN
 
@@ -2564,17 +2609,34 @@ CONFIG_RELOJ:
     BANKSEL OSCCON ; Cambiamos de banco
     BSF OSCCON, 0 ; Seteamos para utilizar reloj interno (((OSCCON) and 07Fh), 0=1)
 
-    ;Se modifican los bits 4 al 6 de OSCCON al valor de 100b para frecuencia de 1 MHz (IRCF=100b)
+    ;Se modifican los bits 4 al 6 de OSCCON al valor de 101b para frecuencia de 2 MHz (IRCF=101b)
     BSF OSCCON, 6
     BCF OSCCON, 5
-    BCF OSCCON, 4
+    BSF OSCCON, 4
+
+    RETURN
+
+CONFIG_TIMER0:
+    BANKSEL OPTION_REG ; Cambiamos de banco
+    BCF ((OPTION_REG) and 07Fh), 5 ; Seteamos TMR0 como temporizador(((OPTION_REG) and 07Fh), 5)
+    BCF ((OPTION_REG) and 07Fh), 3 ; Se asigna el prescaler a TMR0(((OPTION_REG) and 07Fh), 3)
+   ; Se setea el prescaler a 256 BSF <2:0>
+    BSF ((OPTION_REG) and 07Fh), 2 ; ((OPTION_REG) and 07Fh), 2
+    BSF ((OPTION_REG) and 07Fh), 1 ; ((OPTION_REG) and 07Fh), 1
+    BSF ((OPTION_REG) and 07Fh), 0 ; ((OPTION_REG) and 07Fh), 0
+
+    RESET_TMR0 ; Macro
 
     RETURN
 
 ENABLE_INTS:
+    BANKSEL INTCON
     BSF ((INTCON) and 07Fh), 7 ; Se habilitan todas las interrupciones
     BSF ((INTCON) and 07Fh), 3 ; Se habilita la interrupción de cambio de estado de PORTB
     BCF ((INTCON) and 07Fh), 0 ; Flag de cambio de estado de PORTB
+    BSF ((INTCON) and 07Fh), 5 ; Se habilita interrupción del TMR0
+    BCF ((INTCON) and 07Fh), 2 ; Flag de interrupción TMR0
+
     RETURN
 
 CONFIG_IOCRB:
@@ -2585,6 +2647,8 @@ CONFIG_IOCRB:
     BANKSEL PORTA ; Cambio de banco
     MOVF PORTB, W ; Al leer termina la condición de mismatch
     BCF ((INTCON) and 07Fh), 0 ; Se limpia la flag de cambio de estado de PORTB
+
     RETURN
+
 
 END
