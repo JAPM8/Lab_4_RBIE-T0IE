@@ -13,6 +13,11 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>main_preLAB.s</itemPath>
+<<<<<<< Updated upstream
+=======
+      <itemPath>main_Lab.s</itemPath>
+      <itemPath>main_POSTLAB.s</itemPath>
+>>>>>>> Stashed changes
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -63,6 +68,19 @@
         <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
+<<<<<<< Updated upstream
+=======
+      <item path="main_Lab.s" ex="true" overriding="false">
+      </item>
+      <item path="main_preLAB.s" ex="true" overriding="false">
+        <pic-as-assembler>
+        </pic-as-assembler>
+        <pic-as-global>
+        </pic-as-global>
+        <pic-as-linker>
+        </pic-as-linker>
+      </item>
+>>>>>>> Stashed changes
       <pic-as-assembler>
         <property key="fmax-errors" value="20"/>
         <property key="list-custom-assembler-options" value=""/>

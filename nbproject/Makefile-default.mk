@@ -57,6 +57,7 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
+<<<<<<< Updated upstream
 SOURCEFILES_QUOTED_IF_SPACED=main_preLAB.s
 
 # Object Files Quoted if spaced
@@ -68,6 +69,19 @@ OBJECTFILES=${OBJECTDIR}/main_preLAB.o
 
 # Source Files
 SOURCEFILES=main_preLAB.s
+=======
+SOURCEFILES_QUOTED_IF_SPACED=main_POSTLAB.s
+
+# Object Files Quoted if spaced
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main_POSTLAB.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main_POSTLAB.o.d
+
+# Object Files
+OBJECTFILES=${OBJECTDIR}/main_POSTLAB.o
+
+# Source Files
+SOURCEFILES=main_POSTLAB.s
+>>>>>>> Stashed changes
 
 
 
@@ -95,6 +109,7 @@ FINAL_IMAGE_NAME_MINUS_EXTENSION=${DISTDIR}/Lab_4_RBIE_T0IE.X.${IMAGE_TYPE}
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: pic-as-assembler
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
+<<<<<<< Updated upstream
 ${OBJECTDIR}/main_preLAB.o: main_preLAB.s  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main_preLAB.o 
@@ -110,6 +125,23 @@ ${OBJECTDIR}/main_preLAB.o: main_preLAB.s  nbproject/Makefile-${CND_CONF}.mk
 	${MP_AS} -mcpu=PIC16F887 -c \
 	-o ${OBJECTDIR}/main_preLAB.o \
 	main_preLAB.s \
+=======
+${OBJECTDIR}/main_POSTLAB.o: main_POSTLAB.s  nbproject/Makefile-${CND_CONF}.mk 
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/main_POSTLAB.o 
+	${MP_AS} -mcpu=PIC16F887 -c \
+	-o ${OBJECTDIR}/main_POSTLAB.o \
+	main_POSTLAB.s \
+	 -D__DEBUG=1  -msummary=+mem,-psect,-class,-hex,-file,-sha1,-sha256,-xml,-xmlfull -fmax-errors=20 -mwarn=0 -xassembler-with-cpp
+	
+else
+${OBJECTDIR}/main_POSTLAB.o: main_POSTLAB.s  nbproject/Makefile-${CND_CONF}.mk 
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/main_POSTLAB.o 
+	${MP_AS} -mcpu=PIC16F887 -c \
+	-o ${OBJECTDIR}/main_POSTLAB.o \
+	main_POSTLAB.s \
+>>>>>>> Stashed changes
 	 -msummary=+mem,-psect,-class,-hex,-file,-sha1,-sha256,-xml,-xmlfull -fmax-errors=20 -mwarn=0 -xassembler-with-cpp
 	
 endif

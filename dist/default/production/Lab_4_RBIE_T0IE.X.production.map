@@ -5,7 +5,11 @@ Linker command line:
 -W-3 --edf=C:\Program Files\Microchip\xc8\v2.35\pic\dat\en_msgs.txt -cs \
   -h+dist/default/production\Lab_4_RBIE_T0IE.X.production.sym \
   --cmf=dist/default/production\Lab_4_RBIE_T0IE.X.production.cmf -z \
+<<<<<<< Updated upstream
   -Q16F887 -oC:\Users\javyp\AppData\Local\Temp\xcAsavg.4 \
+=======
+  -Q16F887 -oC:\Users\javyp\AppData\Local\Temp\xcAshcg.4 \
+>>>>>>> Stashed changes
   -ver=XC8 PIC(R) Assembler \
   -Mdist/default/production/Lab_4_RBIE_T0IE.X.production.map -E1 \
   --acfsm=1493 -ACODE=00h-07FFhx4 -ASTRCODE=00h-01FFFh -ASTRING=00h-0FFhx32 \
@@ -16,7 +20,11 @@ Linker command line:
   -ASFR1=080h-09Fh -ASFR2=0100h-010Fh -ASFR3=0180h-018Fh \
   -ACONFIG=02007h-02008h -DCONFIG=2 -AIDLOC=02000h-02003h -DIDLOC=2 \
   -AEEDATA=00h-0FFh/02100h -DEEDATA=2 -DCODE=2 -DSTRCODE=2 -DSTRING=2 \
+<<<<<<< Updated upstream
   -DCONST=2 -DENTRY=2 build/default/production/main_preLAB.o 
+=======
+  -DCONST=2 -DENTRY=2 build/default/production/main_POSTLAB.o 
+>>>>>>> Stashed changes
 
 Object code version is 3.11
 
@@ -25,16 +33,29 @@ Machine type is 16F887
 
 
                 Name                               Link     Load   Length Selector   Space Scale
+<<<<<<< Updated upstream
 build/default/production/main_preLAB.o
                 config                             2007     2007        2        0       4
                 resVect                               0        0       16        0       0
                 code                                  0        0      133        0       0
+=======
+build/default/production/main_POSTLAB.o
+                config                             2007     2007        2        0       4
+                resVect                               0        0       3A        0       0
+                code                                  0        0      161        0       0
+                udata_bank0                          20       20        3       20       1
+>>>>>>> Stashed changes
                 udata_shr                            70       70        2       70       1
 
 TOTAL           Name                               Link     Load   Length     Space
         CLASS   CODE           
+<<<<<<< Updated upstream
                 resVect                               0        0       16         0
                 code                                  0        0      133         0
+=======
+                resVect                               0        0       3A         0
+                code                                  0        0      161         0
+>>>>>>> Stashed changes
 
         CLASS   STRCODE        
 
@@ -48,6 +69,10 @@ TOTAL           Name                               Link     Load   Length     Sp
                 udata_shr                            70       70        2         1
 
         CLASS   BANK0          
+<<<<<<< Updated upstream
+=======
+                udata_bank0                          20       20        3         1
+>>>>>>> Stashed changes
 
         CLASS   BANK1          
 
@@ -78,12 +103,17 @@ TOTAL           Name                               Link     Load   Length     Sp
 
 SEGMENTS        Name                           Load    Length   Top    Selector   Space  Class     Delta
 
+<<<<<<< Updated upstream
+=======
+                udata_bank0                    000020  000003  000023        20       1  BANK0       1
+>>>>>>> Stashed changes
                 udata_shr                      000070  000002  000072        70       1  COMMON      1
 
 
 UNUSED ADDRESS RANGES
 
         Name                Unused          Largest block    Delta
+<<<<<<< Updated upstream
         BANK0            0020-006F             50           1
         BANK1            00A0-00EF             50           1
         BANK2            0110-016F             60           1
@@ -100,12 +130,34 @@ UNUSED ADDRESS RANGES
                          0190-01EF             60
         STRCODE          0133-1FFF           1ECD           2
         STRING           0133-1FFF            100           2
+=======
+        BANK0            0023-006F             4D           1
+        BANK1            00A0-00EF             50           1
+        BANK2            0110-016F             60           1
+        BANK3            0190-01EF             60           1
+        CODE             0161-1FFF            800           2
+        COMMON           0072-007F              E           1
+        CONST            0161-1FFF            100           2
+        EEDATA           2100-21FF            100           2
+        ENTRY            0161-1FFF            100           2
+        IDLOC            2000-2003              4           2
+        RAM              0023-006F             4D           1
+                         00A0-00EF             50
+                         0110-016F             60
+                         0190-01EF             60
+        STRCODE          0161-1FFF           1E9F           2
+        STRING           0161-1FFF            100           2
+>>>>>>> Stashed changes
 
                                   Symbol Table
 
 __Hcode        code        0000  __Hconfig      config      2009
 __Hdata        data        0000  __Hedata       edata       0000
+<<<<<<< Updated upstream
 __HresVect     resVect     0000  __Hspace_0     (abs)       0133
+=======
+__HresVect     resVect     0000  __Hspace_0     (abs)       0161
+>>>>>>> Stashed changes
 __Hspace_1     (abs)       0072  __Hspace_3     (abs)       0000
 __Hspace_4     (abs)       4010  __Hudata       udata       0000
 __Hudata_bank0 udata_bank0 0000  __Hudata_bank1 udata_bank1 0000
